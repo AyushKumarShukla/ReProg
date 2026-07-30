@@ -8,6 +8,7 @@
 #include<arpa/inet.h>
 #define MAX_MSG_SIZE 1000
 #define THIS_SERVER_PORT 8888
+#define THAT_SERVER_PORT 8889
 #define BUFFER_SIZE 1024
 
 int sockfd;
@@ -40,18 +41,7 @@ void* sendLoop(void* arg){
 
 int main(int argc, char* argv[]){
 	pthread_t thread_send, thread_receive;
-	/*
-	if(argc < 2){
-		printf("Error: Too few arguments\n");
-		printf("usage: %s <message>\n",argv[0]);
-		return -1;
-	}
-	if(argc > 2){
-		printf("Error: Too many arguments\n");
-		printf("usage: %s <message>\n",argv[0]);
-		return -1;
-	}
-	*/
+	
 	//create socket 
 	if( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
 		perror("Error: Socket creation failed\n");
@@ -64,15 +54,24 @@ int main(int argc, char* argv[]){
 	this_serv_addr.sin_family = AF_INET;
 	this_serv_addr.sin_port = htons(THIS_SERVER_PORT);
 	this_serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-	
+	/*
 	that_serv_addr.sin_family = AF_INET;
-	that_serv_addr.sin_port = htons(8889);
+	that_serv_addr.sin_port = htons(THAT_SERVER_PORT);
 	that_serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	*/
+	// servers need to call bind if they are not going to call sendto or send in the first place
+	// Without binding, the server does not have an associated port
+	// If we have two programs that 'listen' like a 'server' both the programs must 'bind'
+	// themselves to a 'port' so that they have a permanent address
+	// Since 'clients' only 'send' data, they get a port associated ephemerally by the OS
+	// so 'clients' may not 'bind' to a 'port' explicitly
+	// But for 'servers' this ephemeral port selection is not possble as they only 'listen'
+	
 	if (bind(sockfd, (struct sockaddr *)&this_serv_addr, sizeof(this_serv_addr)) < 0) {
 	    perror("Bind failed! Port might already be in use.");
 	    return -1;
 	}
-	printf("\nI AM LISTENING ON PORT %d\n",THIS_SERVER_PORT);
+	printf("\nlog: listening on port: %d\n",THIS_SERVER_PORT);
 	if(pthread_create(&thread_send,NULL,sendLoop,NULL) != 0){
 		perror("failed to create thread_send");
 		return -1;

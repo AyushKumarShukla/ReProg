@@ -6,6 +6,7 @@
 #include<arpa/inet.h>
 #include<pthread.h>
 #define THIS_SERVER_PORT 8889
+#define THAT_SERVER_PORT 8888
 #define BUFFER_SIZE 1024
 #define MAX_MSG_SIZE 1000
 int sockfd;
@@ -48,11 +49,11 @@ int main(int argc, char* argv[]){
 	this_serv_addr.sin_family = AF_INET;
 	this_serv_addr.sin_port = htons(THIS_SERVER_PORT);
 	this_serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");;
-
+/*
 	that_serv_addr.sin_family = AF_INET;
-	that_serv_addr.sin_port = htons(8888);
+	that_serv_addr.sin_port = htons(THAT_SERVER_PORT);
 	that_serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");;
-		
+*/		
 	// servers need to call bind if they are not going to call sendto or send in the first place
 	// Without binding, the server does not have an associated port
 	// If we have two programs that 'listen' like a 'server' both the programs must 'bind'
